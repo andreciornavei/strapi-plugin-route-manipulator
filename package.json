@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-route-manipulator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A strapi plugin that make use of routes to arrange context values, implementing business logic directly on routes.json file.",
   "dependencies": {},
   "author": {
@@ -17,11 +17,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/andreciornavei/strapi-plugin-route-permission.git"
+    "url": "git+https://github.com/andreciornavei/strapi-plugin-route-manipulator.git"
   },
-  "homepage": "https://github.com/andreciornavei/strapi-plugin-route-permission#readme",
+  "homepage": "https://github.com/andreciornavei/strapi-plugin-route-manipulator#readme",
   "bugs": {
-    "url": "https://github.com/andreciornavei/strapi-plugin-route-permission/issues"
+    "url": "https://github.com/andreciornavei/strapi-plugin-route-manipulator/issues"
   },
   "keywords": [
     "strapi",
