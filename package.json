@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-route-manipulator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A strapi plugin that make use of routes to arrange context values, implementing business logic directly on routes.json file.",
   "dependencies": {},
   "author": {
