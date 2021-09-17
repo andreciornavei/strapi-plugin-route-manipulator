@@ -70,7 +70,25 @@ module.exports = async (ctx, next) => {
     } else if (_.isObject(targets)) {
       // if it is an object, extract the key and proccess
       for (const target of Object.keys(targets)) {
-        _.set(ctx, target, _.get(ctx, source))
+        // if it contains deepLevel confit, parse deepLevel
+        if (_.get(targets[target], "deepLevel")) {
+          // retrieve the deep level
+          const deepLevel = _.get(targets[target], "deepLevel") || 0
+          // explode target in parts
+          const parts = target.split(".")
+          const deep = []
+          // separate the deep objecj for the composed dotted-key
+          for (let i = 0; i < deepLevel; i++) deep.push(parts.shift())
+          // join the deepLevel and parts in one string again
+          const deepJoin = deep.join(".")
+          const partsJoin = parts.join(".")
+          // create an empty object to the deep level if it does not exists
+          _.set(ctx, deepJoin, _.get(ctx, deepJoin, {}))
+          // inject the source value to composed dotted-key inside deep level object
+          _.get(ctx, deepJoin)[partsJoin] = _.get(ctx, source)
+        }
+        // else proccess normally
+        else _.set(ctx, target, _.get(ctx, source))
       }
     }
   }

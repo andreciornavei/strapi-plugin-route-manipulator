@@ -13,10 +13,12 @@ function appendPolicy(value) {
       for (const arrangeEntry of Object.values(arrange)) {
         if (_.get(arrangeEntry, "beforePolicy")) {
           const policyIndex = value.config.policies.findIndex(entry => entry == _.get(arrangeEntry, "beforePolicy"))
+          if(policyIndex < 0) throw new Error(`[strapi-plugin-route-manipulator] :: beforePolicy (${_.get(arrangeEntry, "afterPolicy")}) not found on policies definition`)
           insertAt(value.config.policies, policyIndex, 'plugins::route-manipulator.handle')
         }
         if (_.get(arrangeEntry, "afterPolicy")) {
           const policyIndex = value.config.policies.findIndex(entry => entry == _.get(arrangeEntry, "afterPolicy"))
+          if(policyIndex < 0) throw new Error(`[strapi-plugin-route-manipulator] :: afterPolicy (${_.get(arrangeEntry, "afterPolicy")}) not found on policies definition`)
           insertAt(value.config.policies, policyIndex + 1, 'plugins::route-manipulator.handle')
         }
       }
