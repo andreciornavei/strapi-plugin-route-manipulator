@@ -47,14 +47,43 @@ function findManipulatorSettings(ctx) {
   return _.get(route, "config.manipulator", {})
 }
 
+function resolveMultipart(ctx, deepKey) {
+  let parts = deepKey.split(".")
+  if (ctx.is("multipart")) {
+    if (parts[0] == "body" && parts[1] != "data") {
+      parts[0] = `body.data`
+    } else if (parts[0] == "request" && parts[1] == "body" && parts[2] != "data") {
+      parts[1] = `body.data`
+    }
+  }
+  return parts.join(".")
+}
+
+function resolveCtxRequestBodyData(ctx) {
+  if (ctx.is("multipart") && _.get(ctx, "request.body.data")) {
+    if (typeof _.get(ctx, "request.body.data") == "string") {
+      _.set(ctx, "request.body.data", JSON.parse(_.get(ctx, "request.body.data")))
+    }
+  }
+}
+
+function revertCtxRequestBodyData(ctx) {
+  if (ctx.is("multipart") && _.get(ctx, "request.body.data")) {
+    if (typeof _.get(ctx, "request.body.data") != "string") {
+      _.set(ctx, "request.body.data", JSON.stringify(_.get(ctx, "request.body.data")))
+    }
+  }
+}
 
 module.exports = async (ctx, next) => {
   const manipulator = findManipulatorSettings(ctx)
+  resolveCtxRequestBodyData(ctx)
   // retrieve input setting from manipulator
   // it should inject the object value into context object key
   const input = _.get(manipulator, "input", {})
   for (const input_key in input) {
-    _.set(ctx, input_key, input[input_key])
+    const resolvedInputKey = resolveMultipart(ctx, input_key)
+    _.set(ctx, resolvedInputKey, input[input_key])
   }
   // retrieve arrange setting from manipulator
   // it should arrange the source data in context
@@ -65,7 +94,8 @@ module.exports = async (ctx, next) => {
     if (_.isArray(targets)) {
       // if targets is an array os string, proccess it normally
       for (const target of targets) {
-        _.set(ctx, target, _.get(ctx, source))
+        const resolvedInputKey = resolveMultipart(ctx, target)
+        _.set(ctx, resolvedInputKey, _.get(ctx, source))
       }
     } else if (_.isObject(targets)) {
       // if it is an object, extract the key and proccess
@@ -79,9 +109,11 @@ module.exports = async (ctx, next) => {
           const deep = []
           // separate the deep objecj for the composed dotted-key
           for (let i = 0; i < deepLevel; i++) deep.push(parts.shift())
+
           // join the deepLevel and parts in one string again
-          const deepJoin = deep.join(".")
+          const deepJoin = resolveMultipart(ctx, deep.join("."))
           const partsJoin = parts.join(".")
+
           // create an empty object to the deep level if it does not exists
           _.set(ctx, deepJoin, _.get(ctx, deepJoin, {}))
           // inject the source value to composed dotted-key inside deep level object
@@ -92,5 +124,6 @@ module.exports = async (ctx, next) => {
       }
     }
   }
+  revertCtxRequestBodyData(ctx)
   return await next()
 }

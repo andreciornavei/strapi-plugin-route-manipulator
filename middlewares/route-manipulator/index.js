@@ -25,6 +25,7 @@ function appendPolicy(value) {
     }
   }
   value.config.policies.unshift('plugins::route-manipulator.handle');
+  value.config.policies.push('plugins::route-manipulator.handle');
 }
 
 module.exports = strapi => {
