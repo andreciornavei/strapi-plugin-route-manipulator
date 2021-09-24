@@ -120,7 +120,9 @@ module.exports = async (ctx, next) => {
           _.get(ctx, deepJoin)[partsJoin] = _.get(ctx, source)
         }
         // else proccess normally
-        else _.set(ctx, target, _.get(ctx, source))
+        else {
+          _.set(ctx, resolveMultipart(ctx, target), _.get(ctx, source))
+        }
       }
     }
   }
