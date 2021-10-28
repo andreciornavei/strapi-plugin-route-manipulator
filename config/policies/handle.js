@@ -2,12 +2,16 @@
 
 const _ = require("lodash")
 
+function removeLastSlashChar(url) {
+  if (url.slice(-1) === "/") return url.slice(0, -1)
+  return url
+}
 
 function findManipulatorSettings(ctx) {
   // ************************************** //
   // PARSE REQUESTED ROUTE TO ORIGINAL PATH //
   // ************************************** //
-  let originalPath = ctx.request.url.split("?")[0]
+  let originalPath = removeLastSlashChar(ctx.request.url.split("?")[0])
   const params = ctx.params || {}
   // remove the param "0" from route if it exists
   // to prevent broken pregmactch logic replacer
@@ -39,7 +43,7 @@ function findManipulatorSettings(ctx) {
   const route = routes.find(route => {
     return (
       route.method == ctx.request.method &&
-      route.path.replace(regex, "true") === "true"
+      removeLastSlashChar(route.path).replace(regex, "true") === "true"
     )
   })
 
